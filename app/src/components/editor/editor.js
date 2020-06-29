@@ -28,41 +28,61 @@ export default class Editor extends Component {
 
 		axios
 			.get(`../${page}`)
-			.then(res => console.log(this.parseStrToDOM(res.data)))
-			
-		// this.iframe.load(this.currentPage, () => {
-		// 	const body = this.iframe.contentDocument.body;
-		// 	let textNodes = [];
+			.then(res => (this.parseStrToDOM(res.data)))
+			.then(this.wrapTextNodes)
+			.then(dom => {
+				this.virtualDom = dom;
+				return dom;
+			})
+			.then(this.serialzeDOMToString)
+			.then(html => axios.post("./api/saveTempPage.php", {html}))
+			.then(() => this.iframe.load("../temp.html"))
+			.then(() => this.enableEditing())
+	}
 
-		// 	function recursy(element) {
-		// 		element.childNodes.forEach(node => {
-					
-		// 			if(node.nodeName === "#text" && node.nodeValue.replace(/\s+/g, "").length > 0) {
-		// 				textNodes.push(node);
-		// 			} else {
-		// 				recursy(node);
-		// 			}
-		// 		})
-		// 	};
+	enableEditing() {
+		this.iframe.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
+			element.contentEditable = "true";
+		});
 
-		// 	recursy(body);
-
-		// 	textNodes.forEach(node => {
-		// 		const wrapper = this.iframe.contentDocument.createElement('text-editor');
-		// 		node.parentNode.replaceChild(wrapper, node);
-		// 		wrapper.appendChild(node);
-		// 		wrapper.contentEditable = "true";
-		// 	});
-
-			
-		// });
-		
-		
+		console.log(this.virtualDom);
 	}
 
 	parseStrToDOM(str) {
 		const parser = new DOMParser();
 		return parser.parseFromString(str, "text/html");
+	}
+
+	wrapTextNodes(dom) {
+		const body = dom.body;
+		let textNodes = [];
+
+		function recursy(element) {
+			element.childNodes.forEach(node => {
+
+				if(node.nodeName === "#text" && node.nodeValue.replace(/\s+/g, "").length > 0) {
+					textNodes.push(node);
+				} else {
+					recursy(node);
+				}
+			})
+		};
+
+		recursy(body);
+
+		textNodes.forEach((node, i) => {
+			const wrapper = dom.createElement('text-editor');
+			node.parentNode.replaceChild(wrapper, node);
+			wrapper.appendChild(node);
+			wrapper.setAttribute("nodeid", i);
+		});
+
+		return dom;
+	}
+
+	serialzeDOMToString(dom) {
+		const serializer = new XMLSerializer();
+		return  serializer.serializeToString(dom);
 	}
 
 	loadPageList() {
