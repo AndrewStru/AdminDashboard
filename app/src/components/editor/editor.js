@@ -34,10 +34,17 @@ export default class Editor extends Component {
 				this.virtualDom = dom;
 				return dom;
 			})
-			.then(this.serialzeDOMToString)
+			.then(this.serializeDOMToString)
 			.then(html => axios.post("./api/saveTempPage.php", {html}))
 			.then(() => this.iframe.load("../temp.html"))
 			.then(() => this.enableEditing())
+	}
+
+	save() {
+		const newDom = this.virtualDom.cloneNode(this.virtualDom);
+		this.unwrapTextNodes(newDom);
+		const html = this.serializeDOMToString(newDom);
+		console.log(html);
 	}
 
 	enableEditing() {
@@ -73,7 +80,7 @@ export default class Editor extends Component {
 					recursy(node);
 				}
 			})
-		};
+		}
 
 		recursy(body);
 
@@ -87,9 +94,15 @@ export default class Editor extends Component {
 		return dom;
 	}
 
-	serialzeDOMToString(dom) {
+	serializeDOMToString(dom) {
 		const serializer = new XMLSerializer();
 		return  serializer.serializeToString(dom);
+	}
+
+	unwrapTextNodes(dom) {
+		dom.body.querySelectorAll("text-editor").forEach(element => {
+			element.parentNode.replaceChild(element.firstChild, element);
+		});
 	}
 
 	loadPageList() {
@@ -123,7 +136,11 @@ export default class Editor extends Component {
 		// })
 
 		return (
-			<iframe src={this.currentPage} frameBorder="0"></iframe>
+			<>
+				<button onClick={() => this.save()}>Click</button>
+				<iframe src={this.currentPage} frameBorder="0"></iframe>
+			</>
+
 			// <>
 			// 	<input onChange={(e) => {this.setState({newPageName: e.target.value})}} type="text"/>
 
