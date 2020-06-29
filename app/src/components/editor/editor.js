@@ -43,9 +43,16 @@ export default class Editor extends Component {
 	enableEditing() {
 		this.iframe.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
 			element.contentEditable = "true";
+			element.addEventListener("input", () => {
+				this.onTextEdit(element);
+			})
 		});
+	}
 
-		console.log(this.virtualDom);
+	onTextEdit(element) {
+		const id = element.getAttribute("nodeid");
+		this.virtualDom.body.querySelector(`[nodeid="${id}"]`).innerHTML = element.innerHTML;
+		
 	}
 
 	parseStrToDOM(str) {
