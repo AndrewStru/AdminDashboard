@@ -109,7 +109,7 @@ export default class Editor extends Component {
 		return (
 			<>
 				<button onClick={() => this.save()}>Click</button>
-				<iframe src={this.currentPage} frameBorder="0"></iframe>
+				<iframe src={this.currentPage} frameBorder="0"/>
 			</>
 
 			// <>
