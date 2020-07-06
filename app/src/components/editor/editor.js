@@ -3,7 +3,10 @@ import axios from 'axios';
 import React, {Component} from 'react';
 import DOMHelper from '../../helpers/dom-helper';
 import EditorText from '../editor-text';
-import UIkit from "uikit";
+import UIkit from 'uikit';
+import Spiner from '../spiner';
+import ConfirmModal from '../confirm-modal';
+import ChooseModal from '../choose-modal';
 
 export default class Editor extends Component {
 	constructor() {
@@ -11,22 +14,31 @@ export default class Editor extends Component {
 		this.currentPage = "index.html";
 		this.state = {
 			pageList: [],
-			newPageName: ""
+			newPageName: "",
+			loading: true
 		}
 		this.createNewPage = this.createNewPage.bind(this);
+		this.isLoading = this.isLoading.bind(this);
+		this.isLoaded = this.isLoaded.bind(this);
+		this.save = this.save.bind(this);
+		this.init = this.init.bind(this);
 	}
 
 	componentDidMount() {
-		this.init(this.currentPage);
+		this.init(null, this.currentPage);
 	}
 
-	init(page) {
+	init(e, page) {
+		if (e) {
+			e.preventDefault();
+		}
+		this.isLoading();
 		this.iframe = document.querySelector('iframe');
-		this.open(page);
+		this.open(page, this.isLoaded);
 		this.loadPageList();
 	}
 
-	open(page) {
+	open(page, cb) {
 		this.currentPage = page;
 
 		axios
@@ -39,17 +51,24 @@ export default class Editor extends Component {
 			})
 			.then(DOMHelper.serializeDOMToString)
 			.then(html => axios.post("./api/saveTempPage.php", {html}))
-			.then(() => this.iframe.load("../temp.html"))
+			.then(() => this.iframe.load("../fhusmksssdffwwqerty.html"))
+			.then(() => axios.post("./api/deleteTempPage.php"))
 			.then(() => this.enableEditing())
-			.then(() => this.injectStyles());
+			.then(() => this.injectStyles())
+			.then(cb);
+
 	}
 
-	save() {
+	save(onSuccess, onError) {
+		this.isLoading();
 		const newDom = this.virtualDom.cloneNode(this.virtualDom);
 		DOMHelper.unwrapTextNodes(newDom);
 		const html = DOMHelper.serializeDOMToString(newDom);
 		axios
 			.post("./api/savePage.php", {pageName: this.currentPage, html})
+			.then(onSuccess)
+			.catch(onError)
+			.finally(this.isLoaded);
 	}
 
 	enableEditing() {
@@ -79,7 +98,7 @@ export default class Editor extends Component {
 
 	loadPageList() {
 		axios
-			.get("./api")
+			.get("./api/pageList.php")
 			.then(res => this.setState({pageList: res.data}))
 	}
 
@@ -97,12 +116,38 @@ export default class Editor extends Component {
 			.catch(() => alert("Страницы уже нет на сервере!"));
 	}
 
+	isLoading() {
+		this.setState({
+			loading: true
+		})
+	}
+
+	isLoaded() {
+		this.setState({
+			loading: false
+		})
+	}
+
 	render() {
+		const {loading, pageList} = this.state;
+		const modal = true;
+		let spiner;
+
+		loading ? spiner = <Spiner active/> : spiner = <Spiner />
 
 		return (
 			<>
-				<button className="uk-button uk-button-primary">Primary</button>
+				{spiner}
+
 				<iframe src={this.currentPage} frameBorder="0"/>
+
+				<div className="panel">
+					<button className="uk-button uk-button-default uk-margin-small-right" uk-toggle="target: #modal-open">Открыть</button>
+					<button className="uk-button uk-button-primary" uk-toggle="target: #modal-save">Опубликовать</button>
+				</div>
+
+				<ConfirmModal modal={modal} target={'modal-save'} method={this.save}/>
+				<ChooseModal modal={modal} target={'modal-open'} data={pageList} redirect={this.init}/>
 			</>
 
 
