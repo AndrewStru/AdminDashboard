@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, {Component} from 'react';
 import DOMHelper from '../../helpers/dom-helper';
 import EditorText from '../editor-text';
+import UIkit from "uikit";
 
 export default class Editor extends Component {
 	constructor() {
@@ -97,28 +98,14 @@ export default class Editor extends Component {
 	}
 
 	render() {
-		// const {pageList} = this.state;
-		// const pages = pageList.map((page, i) => {
-		// 	return (
-		// 	<h1 key={i}>{page}
-		// 		<a href="#" onClick={() => this.deletePage(page)}>(x)</a>
-		// 	</h1>
-		// 	)
-		// })
 
 		return (
 			<>
-				<button onClick={() => this.save()}>Click</button>
+				<button className="uk-button uk-button-primary">Primary</button>
 				<iframe src={this.currentPage} frameBorder="0"/>
 			</>
 
-			// <>
-			// 	<input onChange={(e) => {this.setState({newPageName: e.target.value})}} type="text"/>
 
-			// 	< button onClick={this.createNewPage}>Создать страницу</button>
-
-			// 	{pages}
-			// </>
 		)
 	}
 }

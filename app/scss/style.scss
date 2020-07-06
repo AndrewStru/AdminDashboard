@@ -1,3 +1,13 @@
+// Переопределение дефолтных значений переменных Bootstrap 4 и определение своих
+//@import "variables";
+
+// Подключение нужных SCSS исходников Bootstrap 4
+// 2. Import default variables and available mixins.
+@import "../../node_modules/uikit/src/scss/variables-theme.scss";
+@import "../../node_modules/uikit/src/scss/mixins-theme.scss";
+@import "../../node_modules/uikit/src/scss/uikit-theme.scss";
+
+
 * {
 	box-sizing: border-box;
 }
