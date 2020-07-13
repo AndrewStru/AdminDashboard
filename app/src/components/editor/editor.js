@@ -89,6 +89,7 @@ export default class Editor extends Component {
 		});
 	}
 
+
 	injectStyles() {
 		const style = this.iframe.contentDocument.createElement("style");
 		style.innerHTML = `
@@ -124,7 +125,12 @@ export default class Editor extends Component {
 		}
 		UIkit.modal.confirm("Вы действительно хотите востановить страницу из этой резерной копии? Все не сохраненные данные будут утеряны!", {labels: {ok: 'Востановить', cancel: 'Отменить'}})
 			.then(() => {
-				console.log('rest');
+				this.isLoading();
+				return axios
+					.post('./api/restoreBackup.php', {"page": this.currentPage, "file": backup})
+		})
+		.then(() => {
+			this.open(this.currentPage, this.isLoaded);
 		})
 	}
 
