@@ -5,11 +5,11 @@ const ConfirmModal = ({modal, target, method}) => {
     return (
         <div id={target} uk-modal={modal.toString()}>
             <div className="uk-modal-dialog uk-modal-body">
-                <h5 className="uk-modal-title">Сохранение</h5>
-                <p>Вы действитель хотите сохранить изменения</p>
+                <h5 className="uk-modal-title">Сохранить страницу</h5>
+                <p>Вы действитель хотите сохранить страницу</p>
                 <p className="uk-text-right">
-                    <button className="uk-button uk-button-default uk-modal-close uk-margin-small-right" type="button">Отменить</button>
-                    <button className="uk-button uk-button-primary uk-modal-close" type="button" onClick={() => method(() => {
+                    <button className="btn btn-danger uk-modal-close uk-margin-small-right" type="button">Отменить</button>
+                    <button className="btn btn-success uk-modal-close" type="button" onClick={() => method(() => {
                             UIkit.notification({message: 'Успешно сохранено', status: 'success'})
                         },
                         () => {

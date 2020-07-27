@@ -40,7 +40,7 @@ const ChooseModal = ({modal, target, data, redirect}) => {
                     {List}
                 </ul>
                 <p className="uk-text-right">
-                    <button className="uk-button uk-button-default uk-modal-close" type="button">Отменить</button>
+                    <button className="btn btn-secondary uk-modal-close" type="button">Отменить</button>
                 </p>
             </div>
         </div>

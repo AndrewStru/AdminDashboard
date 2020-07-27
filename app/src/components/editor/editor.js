@@ -4,6 +4,8 @@ import React, {Component} from 'react';
 import DOMHelper from '../../helpers/dom-helper';
 import EditorText from '../editor-text';
 import UIkit from 'uikit';
+import EditorMeta from "../editor-meta";
+// import bootstrap from 'bootstrap';
 import Spiner from '../spiner';
 import ConfirmModal from '../confirm-modal';
 import ChooseModal from '../choose-modal';
@@ -151,9 +153,6 @@ export default class Editor extends Component {
 		const modal = true;
 		let spiner;
 
-		console.log(backupsList);
-		
-
 		loading ? spiner = <Spiner active/> : spiner = <Spiner />
 
 		return (
@@ -168,6 +167,7 @@ export default class Editor extends Component {
 				<ConfirmModal modal={modal} target={'modal-save'} method={this.save}/>
 				<ChooseModal modal={modal} target={'modal-open'} data={pageList} redirect={this.init}/>
 				<ChooseModal modal={modal} target={'modal-backup'} data={backupsList} redirect={this.restoreBackup}/>
+				{this.virtualDom ? <EditorMeta modal={modal} target={'modal-meta'} virtualDom={this.virtualDom}/> : false}
 			</>
 
 

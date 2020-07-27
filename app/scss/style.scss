@@ -1,5 +1,5 @@
-// Переопределение дефолтных значений переменных Bootstrap 4 и определение своих
-//@import "variables";
+// Подключение нужных SCSS исходников Bootstrap
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
 // Подключение нужных SCSS исходников UIKit
 @import "../../node_modules/uikit/src/scss/variables-theme.scss";
