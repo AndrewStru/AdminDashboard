@@ -5,7 +5,7 @@ import DOMHelper from '../../helpers/dom-helper';
 import EditorText from '../editor-text';
 import UIkit from 'uikit';
 import EditorMeta from "../editor-meta";
-// import bootstrap from 'bootstrap';
+import EditorImages from "../editor-images";
 import Spiner from '../spiner';
 import ConfirmModal from '../confirm-modal';
 import ChooseModal from '../choose-modal';
@@ -51,6 +51,7 @@ export default class Editor extends Component {
 			.get(`../${page}?rnd=${Math.random()}`)
 			.then(res => (DOMHelper.parseStrToDOM(res.data)))
 			.then(DOMHelper.wrapTextNodes)
+			.then(DOMHelper.wrapImages)
 			.then(dom => {
 				this.virtualDom = dom;
 				return dom;
@@ -71,6 +72,7 @@ export default class Editor extends Component {
 		this.isLoading();
 		const newDom = this.virtualDom.cloneNode(this.virtualDom);
 		DOMHelper.unwrapTextNodes(newDom);
+		DOMHelper.unwrapImages(newDom);
 		const html = DOMHelper.serializeDOMToString(newDom);
 		await axios
 			.post("./api/savePage.php", {pageName: this.currentPage, html})
