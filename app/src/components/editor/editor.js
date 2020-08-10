@@ -68,7 +68,7 @@ export default class Editor extends Component {
 
 	}
 
-	async save(onSuccess, onError) {
+	async save() {
 		this.isLoading();
 		const newDom = this.virtualDom.cloneNode(this.virtualDom);
 		DOMHelper.unwrapTextNodes(newDom);
@@ -76,8 +76,8 @@ export default class Editor extends Component {
 		const html = DOMHelper.serializeDOMToString(newDom);
 		await axios
 			.post("./api/savePage.php", {pageName: this.currentPage, html})
-			.then(onSuccess)
-			.catch(onError)
+			.then(() => this.showNotifications('Успешно сохранено', 'success'))
+			.catch(() => this.showNotifications('Ошибка сохранения', 'danger'))
 			.finally(this.isLoaded);
 
 		this.loadBackupsList();
@@ -87,9 +87,13 @@ export default class Editor extends Component {
 		this.iframe.contentDocument.body.querySelectorAll("text-editor").forEach(element => {
 			const id = element.getAttribute("nodeid");
 			const virtualElement = this.virtualDom.body.querySelector(`[nodeid="${id}"]`)
-
-
 			new EditorText(element, virtualElement);
+		});
+
+		this.iframe.contentDocument.body.querySelectorAll("[editableimgid]").forEach(element => {
+			const id = element.getAttribute("editableimgid");
+			const virtualElement = this.virtualDom.body.querySelector(`[editableimgid="${id}"]`)
+			new EditorImages(element, virtualElement, this.isLoading, this.isLoaded, this.showNotifications);
 		});
 	}
 
@@ -105,8 +109,16 @@ export default class Editor extends Component {
 				outline: 3px solid red;
 				outline-offset: 8px;
 			}
+			[editableimgid]:hover {
+				outline: 3px solid orange;
+				outline-offset: 8px;
+			}
 		`;
 		this.iframe.contentDocument.head.appendChild(style);
+	}
+
+	showNotifications(message, status) {
+		UIkit.notification({message, status});
 	}
 
 	loadPageList() {
@@ -161,6 +173,7 @@ export default class Editor extends Component {
 			<>
 
 				<iframe src="" frameBorder="0"/>
+				<input id="img-upload" type="file" accept="image/*" style={{display: 'none'}}/>
 
 				{spiner}
 

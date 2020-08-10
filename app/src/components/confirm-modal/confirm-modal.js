@@ -1,5 +1,4 @@
 import React from 'react';
-import UIkit from 'uikit';
 
 const ConfirmModal = ({modal, target, method}) => {
     return (
@@ -9,12 +8,7 @@ const ConfirmModal = ({modal, target, method}) => {
                 <p>Вы действитель хотите сохранить страницу</p>
                 <p className="uk-text-right">
                     <button className="btn btn-danger uk-modal-close uk-margin-small-right" type="button">Отменить</button>
-                    <button className="btn btn-success uk-modal-close" type="button" onClick={() => method(() => {
-                            UIkit.notification({message: 'Успешно сохранено', status: 'success'})
-                        },
-                        () => {
-                            UIkit.notification({message: 'Ошибка сохранения', status: 'danger'})
-                        })}>Сохранить</button>
+                    <button className="btn btn-success uk-modal-close" type="button" onClick={() => method()}>Сохранить</button>
                 </p>
             </div>
         </div>
