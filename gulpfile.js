@@ -2,7 +2,7 @@ const gulp = require("gulp");
 const webpack = require("webpack-stream");
 const sass = require("gulp-sass");
 
-const dist = "D:/Install/Open Server 5.3.5/OSPanel/domains/lending/admin";
+const dist = "/opt/lampp/htdocs/lending/admin";
 
 gulp.task("copy-html", () => {
 	return gulp.src("./app/src/index.html")
@@ -50,6 +50,9 @@ gulp.task("build-sass", () => {
 });
 
 gulp.task("copy-api", () => {
+	gulp.src("./app/api/**/.*")
+		.pipe(gulp.dest(dist + "/api"))
+
 	return gulp.src("./app/api/**/*.*")
 		.pipe(gulp.dest(dist + "/api"))
 });
