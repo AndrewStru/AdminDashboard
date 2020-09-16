@@ -22,13 +22,16 @@ export default class Editor extends Component {
 			backupsList: [],
 			newPageName: "",
 			loading: true,
-			auth: false
+			auth: false,
+			loginError: false,
+			loginLenghtError: false
 		}
 		this.isLoading = this.isLoading.bind(this);
 		this.isLoaded = this.isLoaded.bind(this);
 		this.save = this.save.bind(this);
 		this.init = this.init.bind(this);
 		this.login = this.login.bind(this);
+		this.logout = this.logout.bind(this);
 		this.restoreBackup = this.restoreBackup.bind(this);
 	}
 
@@ -46,7 +49,6 @@ export default class Editor extends Component {
 		axios
 			.get("./api/checkAuth.php")
 			.then(res => {
-				console.log(res.data);
 				this.setState({
 					auth: res.data.auth
 				})
@@ -59,10 +61,25 @@ export default class Editor extends Component {
 				.post('./api/login.php', {"password": pass})
 				.then(res => {
 					this.setState({
-						auth: res.data.auth
+						auth: res.data.auth,
+						loginError: !res.data.auth,
+						loginLenghtError: false
 					})
 				})
-		} 
+		} else {
+			this.setState({
+				loginError: false,
+				loginLenghtError: true
+			})
+		}
+	}
+
+	logout() {
+		axios
+			.get("./api/logout.php")
+			.then(() => {
+				window.location.replace("/");
+			})
 	}
 
 	init(e, page) {
@@ -198,14 +215,14 @@ export default class Editor extends Component {
 	}
 
 	render() {
-		const {loading, pageList, backupsList, auth} = this.state;
+		const {loading, pageList, backupsList, auth, loginError, loginLenghtError} = this.state;
 		const modal = true;
 		let spiner;
 
 		loading ? spiner = <Spiner active/> : spiner = <Spiner/>
 
 		if (!auth) {
-			return <Login login={this.login}/>
+			return <Login login={this.login} lenghtErr={loginLenghtError} logErr={loginError}/>
 		}
 
 		return (
@@ -217,7 +234,26 @@ export default class Editor extends Component {
 
 				<Panel/>
 
-				<ConfirmModal modal={modal} target={'modal-save'} method={this.save}/>
+				<ConfirmModal 
+					modal={modal} 
+					target={'modal-save'} 
+					method={this.save}
+					text={{
+						title: "Сохранить страницу",
+						descr: "Вы действитель хотите сохранить страницу?",
+						btn: "Сохранить"
+					}}/>
+
+				<ConfirmModal 
+					modal={modal} 
+					target={'modal-logout'} 
+					method={this.logout}
+					text={{
+						title: "Выход",
+						descr: "Вы действитель хотите выйти?",
+						btn: "Выйти"
+					}}/>
+
 				<ChooseModal modal={modal} target={'modal-open'} data={pageList} redirect={this.init}/>
 				<ChooseModal modal={modal} target={'modal-backup'} data={backupsList} redirect={this.restoreBackup}/>
 				{this.virtualDom ? <EditorMeta modal={modal} target={'modal-meta'} virtualDom={this.virtualDom}/> : false}
